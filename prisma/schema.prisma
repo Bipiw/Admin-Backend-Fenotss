@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("MEMBER") // ENUM: SUPER_ADMIN, MEMBERS_AFFAIRS, FINANCE, EDUCATION, CHOIR, OFFICE, MEMBER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile   MemberProfile?
+  
+  recordedFinancials     FinancialRecord[]    @relation("Recorder")
+  recordedGrades         AcademicRecord[]     @relation("GradeRecorder")
+  eligibilityOverrides   ServiceEligibility[] @relation("EligibilityOverrider")
+  sentNotifications      MemberNotification[] @relation("NotificationSender")
+  issuedClearances       ClearanceRecord[]    @relation("ClearanceIssuer")
+  
+  announcements Announcement[]
+  auditLogs     AuditLog[]
+}
+
+model MemberProfile {
+  id          String     @id @default(cuid())
+  firstName   String
+  lastName    String
+  phone       String?
+  address     String?
+  department  String     @default("OTHER") // ENUM: CHOIR, SUNDAY_SCHOOL, DEACONS, OTHER
+  
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  attendance          Attendance[]
+  financials          FinancialRecord[]
+  academics           AcademicRecord[]
+  eligibility         ServiceEligibility?
+  memberNotifications MemberNotification[]
+  clearances          ClearanceRecord[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  date      DateTime
+  type      String   // ENUM: SUNDAY_SERVICE, CHOIR_PRACTICE, EVENT, OTHER
+  status    String   @default("PRESENT") // ENUM: PRESENT, ABSENT, EXCUSED
+
+  memberId  String
+  member    MemberProfile    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([memberId])
+  @@index([date])
+}
+
+model FinancialRecord {
+  id          String   @id @default(cuid())
+  amount      Decimal
+  type        String   // ENUM: MONTHLY_CONTRIBUTION, MEMBERSHIP_FEE, DONATION, OTHER
+  status      String   @default("PENDING") // ENUM: PAID, PENDING, OVERDUE
+  date        DateTime @default(now())
+  description String?
+  
+  receiptRef  String?  // Reference number for manual payment receipt
+  receiptUrl  String?  // Path to uploaded receipt image/file
+  verified    Boolean  @default(false)
+
+  memberId    String
+  member      MemberProfile   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  recordedById String?
+  recordedBy   User?          @relation("Recorder", fields: [recordedById], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model AcademicRecord {
+  id          String   @id @default(cuid())
+  year        Int
+  semester    String?  // e.g. "1st", "2nd"
+  status      String   @default("ENROLLED") // ENUM: ENROLLED, GRADUATED, DROPPED, ON_LEAVE
+  remarks     String?
+
+  // Grade fields
+  subjectName  String?
+  examScore    Float?
+  totalScore   Float?
+  gradeLabel   String?  // e.g. "A", "B+", "ጥሩ"
+
+  memberId    String
+  member      MemberProfile  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  recordedById String?
+  recordedBy   User?   @relation("GradeRecorder", fields: [recordedById], references: [id])
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([memberId])
+  @@index([year])
+}
+
+model ServiceEligibility {
+  id             String   @id @default(cuid())
+  status         String   @default("PENDING") // ELIGIBLE, INELIGIBLE, PENDING
+  reason         String?
+  attendanceRate Float?   // 0-100 percentage
+  financeRate    Float?   // 0-100 percentage
+  academicScore  Float?   // average score
+  computedAt     DateTime @default(now())
+
+  memberId       String   @unique
+  member         MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  overriddenById String?
+  overriddenBy   User?    @relation("EligibilityOverrider", fields: [overriddenById], references: [id])
+  overrideReason String?
+
+  updatedAt      DateTime @updatedAt
+}
+
+model MemberNotification {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String   @default("INFO") // INFO, ELIGIBILITY, ALERT
+  isRead    Boolean  @default(false)
+
+  memberId  String
+  member    MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  sentById  String?
+  sentBy    User?    @relation("NotificationSender", fields: [sentById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+}
+
+model ClearanceRecord {
+  id          String   @id @default(cuid())
+  reason      String
+  notes       String?
+  issuedAt    DateTime @default(now())
+
+  memberId    String
+  member      MemberProfile @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  issuedById  String
+  issuedBy    User     @relation("ClearanceIssuer", fields: [issuedById], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String   @default("INFO") // INFO, ALERT, ACADEMIC
+  
+  createdAt DateTime @default(now())
+}
+
+model StudyMaterial {
+  id        String   @id @default(cuid())
+  title     String
+  type      String   // PDF, VIDEO, LINK
+  url       String
+  description String?
+  
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isActive  Boolean  @default(true)
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  details   String?
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  targetId  String?
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  key         String @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
