@@ -1,13 +1,18 @@
+import React from "react"
 import prisma from "@/lib/prisma"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Music, GraduationCap, UserCircle, Building2 } from "lucide-react"
 import { EthiopianDateDisplay } from "@/components/dashboard/ethiopian-date-display"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { cookies } from "next/headers"
+import { getTranslation } from "@/lib/translations"
 
 export const dynamic = 'force-dynamic'
 
 export default async function OfficeDashboard() {
+    const cookieStore = cookies()
+    const lang = cookieStore.get("language")?.value || "en"
+    const t = (key: string) => getTranslation(lang, key)
+
     const [totalMembers, totalUsers] = await Promise.all([
         prisma.user.count({ where: { role: "MEMBER" } }),
         prisma.user.count(),
@@ -28,7 +33,7 @@ export default async function OfficeDashboard() {
 
     const recentClearances = await prisma.clearanceRecord.count()
 
-    const deptIcon: Record<string, any> = {
+    const deptIcon: Record<string, React.ComponentType<{ size?: number | string }>> = {
         CHOIR: Music,
         SUNDAY_SCHOOL: GraduationCap,
         DEACONS: UserCircle,
@@ -36,88 +41,117 @@ export default async function OfficeDashboard() {
     }
 
     return (
-        <div className="p-8 space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">ጽ/ቤት — Office Overview</h2>
-                    <p className="text-muted-foreground text-sm">Global member metrics and administration.</p>
+        <div>
+            {/* Page Heading */}
+            <div className="page-heading">
+                <div className="page-heading-copy">
+                    <span className="page-icon">
+                        <Building2 size={22} />
+                    </span>
+                    <div>
+                        <p className="eyebrow mb-1">{t("role.office")}</p>
+                        <h1 className="h3 mb-1">{lang === "am" ? "ጽ/ቤት — የቢሮ አጠቃላይ እይታ" : "Office Overview"}</h1>
+                        <p className="text-muted mb-0">{lang === "am" ? "አጠቃላይ አባላትን እና አስተዳደርን ያስተዳድሩ" : "Global member metrics and administration"}</p>
+                    </div>
                 </div>
-                <EthiopianDateDisplay />
+                <div className="heading-actions">
+                    <EthiopianDateDisplay />
+                </div>
             </div>
 
             {/* KPI Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Members</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalMembers}</div>
-                        <p className="text-xs text-muted-foreground">{totalUsers} total system users</p>
-                    </CardContent>
-                </Card>
+            <div className="metrics-row">
+                <article className="metric-card metric-primary">
+                    <div className="metric-top">
+                        <span className="metric-label">{lang === "am" ? "ጠቅላላ አባላት" : "Total Members"}</span>
+                        <span className="metric-icon"><Users size={18} /></span>
+                    </div>
+                    <div className="metric-value">{totalMembers.toLocaleString()}</div>
+                    <div className="metric-meta">
+                        <span>{totalUsers} {lang === "am" ? "ጠቅላላ ተጠቃሚዎች" : "total system users"}</span>
+                    </div>
+                </article>
+
                 {byDepartment.map(dept => {
                     const Icon = deptIcon[dept.department] || Users
                     return (
-                        <Card key={dept.department}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">{dept.department}</CardTitle>
-                                <Icon className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{dept._count._all}</div>
-                                <p className="text-xs text-muted-foreground">Members</p>
-                            </CardContent>
-                        </Card>
+                        <article key={dept.department} className="metric-card metric-indigo">
+                            <div className="metric-top">
+                                <span className="metric-label">{dept.department.replace('_', ' ')}</span>
+                                <span className="metric-icon"><Icon size={18} /></span>
+                            </div>
+                            <div className="metric-value">{dept._count._all}</div>
+                            <div className="metric-meta">
+                                <span>{lang === "am" ? "አባላት" : "Members"}</span>
+                            </div>
+                        </article>
                     )
                 })}
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Clearances Issued</CardTitle>
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{recentClearances}</div>
-                        <p className="text-xs text-muted-foreground">Total leaving certificates</p>
-                    </CardContent>
-                </Card>
+
+                <article className="metric-card metric-warning">
+                    <div className="metric-top">
+                        <span className="metric-label">{lang === "am" ? "የተሰጡ ፍቃዶች" : "Clearances Issued"}</span>
+                        <span className="metric-icon"><Building2 size={18} /></span>
+                    </div>
+                    <div className="metric-value">{recentClearances}</div>
+                    <div className="metric-meta">
+                        <span>{lang === "am" ? "ጠቅላላ ሰርቲፊኬቶች" : "Total leaving certificates"}</span>
+                    </div>
+                </article>
             </div>
 
             {/* Quick Actions */}
-            <div className="flex gap-4 flex-wrap">
-                <Link href="/dashboard/office/members">
-                    <Button variant="outline" className="gap-2"><Users className="h-4 w-4" /> Search Members</Button>
+            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+                <Link href="/dashboard/office/members" className="btn btn-outline">
+                    <Users size={16} /> {lang === "am" ? "አባላትን ፈልግ" : "Search Members"}
                 </Link>
-                <Link href="/dashboard/office/clearance">
-                    <Button variant="outline" className="gap-2"><Building2 className="h-4 w-4" /> Issue Clearance</Button>
+                <Link href="/dashboard/office/clearance" className="btn btn-primary">
+                    <Building2 size={16} /> {lang === "am" ? "ፍቃድ አስተላልፍ" : "Issue Clearance"}
                 </Link>
             </div>
 
-            {/* Recent Members */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Recently Registered Members</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-3">
-                        {recentMembers.map(m => (
-                            <div key={m.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                                <div>
-                                    <p className="text-sm font-medium">{m.firstName} {m.lastName}</p>
-                                    <p className="text-xs text-muted-foreground">{m.user.email} · {m.department}</p>
-                                </div>
-                                <span className="text-xs text-muted-foreground">
-                                    {new Date(m.user.createdAt).toLocaleDateString()}
-                                </span>
-                            </div>
-                        ))}
-                        {recentMembers.length === 0 && (
-                            <p className="text-muted-foreground text-sm">No members yet.</p>
-                        )}
+            {/* Recent Members Table */}
+            <div className="panel">
+                <div className="panel-header">
+                    <div>
+                        <h2 className="section-title">
+                            <span className="title-icon"><Users size={16} /></span>
+                            {lang === "am" ? "የቅርብ ጊዜ ተመዝጋቢ አባላት" : "Recently Registered Members"}
+                        </h2>
+                        <p className="text-muted mb-0">{lang === "am" ? "ዘግይቶ ያካፈሉ 5 አባላት" : "Last 5 registered members"}</p>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+                {recentMembers.length === 0 ? (
+                    <p style={{ color: "var(--admin-muted)", fontSize: "0.9rem" }}>{lang === "am" ? "ምንም አባላት አልተገኙም" : "No members yet."}</p>
+                ) : (
+                    <div className="admin-table-wrap">
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>{lang === "am" ? "ስም" : "Name"}</th>
+                                    <th>{lang === "am" ? "ኢሜይል" : "Email"}</th>
+                                    <th>{lang === "am" ? "ክፍል" : "Department"}</th>
+                                    <th>{lang === "am" ? "ቀን" : "Registered"}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {recentMembers.map(m => (
+                                    <tr key={m.id}>
+                                        <td style={{ fontWeight: 700 }}>{m.firstName} {m.lastName}</td>
+                                        <td className="text-muted">{m.user.email}</td>
+                                        <td>
+                                            <span className="badge badge-primary">{m.department}</span>
+                                        </td>
+                                        <td className="text-muted">
+                                            {new Date(m.user.createdAt).toLocaleDateString(lang === "am" ? 'am-ET' : 'en-US')}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Calendar } from "lucide-react"
 import { formatEthDate } from "@/lib/calendar-utils"
+import { useLanguage } from "@/contexts/language-context"
 
 interface EthiopianDateDisplayProps {
     className?: string;
@@ -10,6 +11,7 @@ interface EthiopianDateDisplayProps {
 
 export function EthiopianDateDisplay({ className }: EthiopianDateDisplayProps) {
     const [date, setDate] = useState<Date | null>(null)
+    const { language } = useLanguage()
 
     useEffect(() => {
         setDate(new Date())
@@ -19,14 +21,14 @@ export function EthiopianDateDisplay({ className }: EthiopianDateDisplayProps) {
 
     if (!date) return null
 
-    const gregorianDate = date.toLocaleDateString('en-US', {
+    const gregorianDate = date.toLocaleDateString(language === "am" ? 'am-ET' : 'en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     })
 
-    const ethiopianDate = formatEthDate(date, "am")
+    const ethiopianDate = formatEthDate(date, language)
 
     return (
         <div className={`flex flex-col items-end gap-1 ${className}`}>

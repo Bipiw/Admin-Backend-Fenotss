@@ -244,7 +244,7 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation currentLang={currentLang} onLanguageChange={setCurrentLang} />
+      <Navigation />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -408,7 +408,7 @@ export default function NewsPage() {
         </section>
       </main>
 
-      <Footer currentLang={currentLang} />
+      <Footer />
     </div>
   )
 }

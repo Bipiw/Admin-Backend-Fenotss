@@ -1,11 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, CreditCard, Bell, ChevronRight, ShieldCheck, ArrowDownRight, User, GraduationCap, BookOpen, Clock, Activity, Settings } from "lucide-react"
+import { Calendar, CreditCard, ShieldCheck, Activity, User, GraduationCap, BookOpen, ChevronRight } from "lucide-react"
 import Link from "next/link"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { cookies } from "next/headers"
+import { getTranslation } from "@/lib/translations"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,9 +12,13 @@ export default async function MemberDashboard() {
     const session = await getServerSession(authOptions)
     if (!session) return null
 
+    const cookieStore = cookies()
+    const lang = cookieStore.get("language")?.value || "en"
+    const t = (key: string) => getTranslation(lang, key)
+
     const userProfile = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { 
+        include: {
             profile: {
                 include: {
                     eligibility: true,
@@ -27,305 +30,259 @@ export default async function MemberDashboard() {
 
     if (!userProfile?.profile) {
         return (
-            <div className="p-8 space-y-8 max-w-xl mx-auto mt-10 text-center">
-                <Card className="border-[#C5A880]/30 shadow-xl bg-white dark:bg-[#0B1B3D]">
-                    <CardContent className="pt-6">
-                        <h2 className="text-2xl font-bold tracking-tight text-[#0B1B3D] dark:text-[#C5A880]">Welcome, {userProfile?.email}</h2>
-                        <p className="text-destructive mt-2">Profile not found. Please contact administration to register your member profile.</p>
-                    </CardContent>
-                </Card>
+            <div className="panel" style={{ textAlign: "center", padding: "3rem" }}>
+                <h1 className="h3 mb-2">Welcome, {userProfile?.email}</h1>
+                <p style={{ color: "var(--admin-danger)", marginTop: "0.5rem" }}>
+                    Profile not found. Please contact administration to register your member profile.
+                </p>
             </div>
         )
     }
 
     const profile = userProfile.profile
 
-    // Fetch Recent Payments
-    const recentPayments = await prisma.financialRecord.findMany({
-        where: { memberId: profile.id },
-        orderBy: { date: 'desc' },
-        take: 4
-    })
-
-    // Fetch Recent Attendance
-    const recentAttendance = await prisma.attendance.findMany({
-        where: { memberId: profile.id },
-        orderBy: { date: 'desc' },
-        take: 6
-    })
+    const [recentPayments, recentAttendance] = await Promise.all([
+        prisma.financialRecord.findMany({
+            where: { memberId: profile.id },
+            orderBy: { date: 'desc' },
+            take: 4
+        }),
+        prisma.attendance.findMany({
+            where: { memberId: profile.id },
+            orderBy: { date: 'desc' },
+            take: 6
+        })
+    ])
 
     const eligibility = profile.eligibility
     const isEligible = eligibility?.status === "ELIGIBLE"
-    const initials = profile.firstName ? profile.firstName.substring(0,2).toUpperCase() : "??"
-
-    // Simple attendance calculation for visual indicators
+    const initials = profile.firstName ? profile.firstName.substring(0, 2).toUpperCase() : "??"
     const presentCount = recentAttendance.filter(a => a.status === "PRESENT").length
     const totalCount = recentAttendance.length
     const attendanceRate = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 100
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto text-[#0B1B3D] dark:text-slate-100">
-            {/* Header / Welcome Hero */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1B3D] via-[#152e61] to-[#1a3875] p-6 md:p-8 text-white shadow-xl">
-                <div className="absolute top-0 right-0 -mt-6 -mr-6 w-48 h-48 rounded-full bg-[#C5A880]/10 blur-3xl pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
-                
-                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-5">
-                        <Avatar className="h-16 w-16 md:h-20 md:w-20 ring-4 ring-[#C5A880] ring-offset-4 ring-offset-[#0B1B3D]">
-                            <AvatarFallback className="bg-[#C5A880] text-[#0B1B3D] font-black text-xl md:text-2xl">
-                                {initials}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="text-white/60 text-sm font-medium uppercase tracking-wider">Welcome back,</p>
-                            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">{profile.firstName} {profile.lastName}</h1>
-                            <p className="text-xs text-white/50 mt-1">Department: <span className="font-semibold text-[#C5A880] uppercase">{profile.department || "General"}</span></p>
-                        </div>
+        <div>
+            {/* Page Heading */}
+            <div className="page-heading">
+                <div className="page-heading-copy">
+                    <div className="profile-avatar" style={{ width: 52, height: 52, fontSize: "1.1rem" }}>
+                        {initials}
                     </div>
-                    
-                    <div className="flex items-center gap-3">
-                        <div className="hidden md:block bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-right">
-                            <p className="text-xs text-white/60">Local Date</p>
-                            <p className="text-sm font-semibold text-[#C5A880] mt-0.5">
-                                {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                            </p>
-                        </div>
-                        <button className="relative p-3 bg-white/10 hover:bg-white/20 transition rounded-full">
-                            <Bell className="h-5 w-5 text-white" />
-                            <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-[#0B1B3D]"></span>
-                        </button>
+                    <div>
+                        <p className="eyebrow mb-1">{t("member.dash.welcomeBack")}</p>
+                        <h1 className="h3 mb-1">{profile.firstName} {profile.lastName}</h1>
+                        <p className="text-muted mb-0">{t("member.dash.department")}: <strong>{profile.department || "General"}</strong></p>
                     </div>
+                </div>
+                <div className="text-muted font-semibold small">
+                    {new Date().toLocaleDateString(lang === "am" ? 'am-ET' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
             </div>
 
-            {/* KPI Cards Row */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {/* 1. Service Status */}
-                <Card className="border-none shadow-md overflow-hidden bg-white dark:bg-[#0B1B3D]/80 relative group hover:shadow-lg transition-all">
-                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#C5A880]"></div>
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Service Status</p>
-                                <h3 className={`text-xl font-bold mt-2 ${isEligible ? 'text-emerald-500' : 'text-amber-500'}`}>
-                                    {isEligible ? 'Eligible (ብቁ)' : 'Pending'}
-                                </h3>
-                                <p className="text-[10px] text-muted-foreground mt-1">Status of system clearance</p>
-                            </div>
-                            <div className={`p-3 rounded-2xl ${isEligible ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                                <ShieldCheck className="h-6 w-6" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* KPI Cards */}
+            <div className="metrics-row">
+                <article className={`metric-card ${isEligible ? "metric-success" : "metric-warning"}`}>
+                    <div className="metric-top">
+                        <span className="metric-label">{t("member.dash.serviceStatus")}</span>
+                        <span className="metric-icon"><ShieldCheck size={18} /></span>
+                    </div>
+                    <div className="metric-value" style={{ fontSize: "1.6rem" }}>
+                        {isEligible ? t("member.dash.eligible") : t("member.dash.pending")}
+                    </div>
+                    <div className="metric-meta">
+                        <span className={isEligible ? "text-success" : "text-danger"}>
+                            {t("member.dash.statusDetail")}
+                        </span>
+                    </div>
+                </article>
 
-                {/* 2. Last Payment */}
-                <Card className="border-none shadow-md overflow-hidden bg-white dark:bg-[#0B1B3D]/80 relative group hover:shadow-lg transition-all">
-                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#0B1B3D]"></div>
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Latest Payment</p>
-                                <h3 className="text-xl font-extrabold mt-2 text-[#0B1B3D] dark:text-slate-100">
-                                    {recentPayments[0] ? `${recentPayments[0].amount} ETB` : "0 ETB"}
-                                </h3>
-                                <p className="text-[10px] text-muted-foreground mt-1">
-                                    {recentPayments[0] ? `Paid on ${new Date(recentPayments[0].date).toLocaleDateString()}` : "No payments found"}
-                                </p>
-                            </div>
-                            <div className="p-3 rounded-2xl bg-[#0B1B3D]/5 dark:bg-white/5 text-[#0B1B3D] dark:text-[#C5A880]">
-                                <CreditCard className="h-6 w-6" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <article className="metric-card metric-primary">
+                    <div className="metric-top">
+                        <span className="metric-label">{t("member.dash.latestPayment")}</span>
+                        <span className="metric-icon"><CreditCard size={18} /></span>
+                    </div>
+                    <div className="metric-value" style={{ fontSize: "1.6rem" }}>
+                        {recentPayments[0] ? `${Number(recentPayments[0].amount).toLocaleString()} ETB` : "0 ETB"}
+                    </div>
+                    <div className="metric-meta">
+                        {recentPayments[0]
+                            ? <span>{t("member.dash.paidOn")} {new Date(recentPayments[0].date).toLocaleDateString(lang === "am" ? 'am-ET' : 'en-US')}</span>
+                            : <span>{t("member.dash.noPayments")}</span>
+                        }
+                    </div>
+                </article>
 
-                {/* 3. Attendance Rate */}
-                <Card className="border-none shadow-md overflow-hidden bg-white dark:bg-[#0B1B3D]/80 relative group hover:shadow-lg transition-all">
-                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-blue-500"></div>
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Attendance Rate</p>
-                                <h3 className="text-xl font-extrabold mt-2 text-[#0B1B3D] dark:text-slate-100">
-                                    {attendanceRate}%
-                                </h3>
-                                <p className="text-[10px] text-muted-foreground mt-1">Based on recent {totalCount} records</p>
-                            </div>
-                            <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500">
-                                <Calendar className="h-6 w-6" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <article className="metric-card metric-primary">
+                    <div className="metric-top">
+                        <span className="metric-label">{t("member.dash.attendanceRate")}</span>
+                        <span className="metric-icon"><Calendar size={18} /></span>
+                    </div>
+                    <div className="metric-value">{attendanceRate}%</div>
+                    <div className="metric-meta">
+                        <span>{lang === "am" ? `${totalCount} መዝገቦች` : `${totalCount} records`}</span>
+                    </div>
+                </article>
 
-                {/* 4. Active Record Stats */}
-                <Card className="border-none shadow-md overflow-hidden bg-white dark:bg-[#0B1B3D]/80 relative group hover:shadow-lg transition-all">
-                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-500"></div>
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Engagement</p>
-                                <h3 className="text-xl font-bold mt-2 text-emerald-500">
-                                    Active
-                                </h3>
-                                <p className="text-[10px] text-muted-foreground mt-1">Profile stands operational</p>
-                            </div>
-                            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-500">
-                                <Activity className="h-6 w-6" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <article className="metric-card metric-success">
+                    <div className="metric-top">
+                        <span className="metric-label">{t("member.dash.engagement")}</span>
+                        <span className="metric-icon"><Activity size={18} /></span>
+                    </div>
+                    <div className="metric-value" style={{ fontSize: "1.6rem" }}>
+                        {t("member.dash.active")}
+                    </div>
+                    <div className="metric-meta">
+                        <span className="text-success">{t("member.dash.operational")}</span>
+                    </div>
+                </article>
             </div>
 
-            {/* Main Grid Content */}
-            <div className="grid gap-6 lg:grid-cols-3">
-                {/* Left Columns - col-span-2: Quick Actions & Attendance Details */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Quick Actions */}
-                    <Card className="border border-slate-100 dark:border-slate-800 shadow-md">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-bold">Quick Actions</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <Link href="/dashboard/member/finance" className="group flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-[#C5A880]/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all hover:-translate-y-1">
-                                    <div className="h-14 w-14 rounded-2xl bg-[#C5A880]/10 flex items-center justify-center text-[#C5A880] group-hover:scale-110 transition-transform">
-                                        <CreditCard className="h-6 w-6" />
-                                    </div>
-                                    <span className="text-xs font-bold mt-3 text-[#0B1B3D] dark:text-slate-200">Pay Dues</span>
-                                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Manage payments</span>
-                                </Link>
-                                <Link href="/dashboard/member/attendance" className="group flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-blue-400/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all hover:-translate-y-1">
-                                    <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
-                                        <Calendar className="h-6 w-6" />
-                                    </div>
-                                    <span className="text-xs font-bold mt-3 text-[#0B1B3D] dark:text-slate-200">Attendance</span>
-                                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Verify check-ins</span>
-                                </Link>
-                                <Link href="/dashboard/member/grades" className="group flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-indigo-400/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all hover:-translate-y-1">
-                                    <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform">
-                                        <GraduationCap className="h-6 w-6" />
-                                    </div>
-                                    <span className="text-xs font-bold mt-3 text-[#0B1B3D] dark:text-slate-200">My Grades</span>
-                                    <span className="text-[10px] text-muted-foreground mt-1 text-center">View exam results</span>
-                                </Link>
-                                <Link href="/dashboard/member/profile" className="group flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-slate-400/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all hover:-translate-y-1">
-                                    <div className="h-14 w-14 rounded-2xl bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:scale-110 transition-transform">
-                                        <User className="h-6 w-6" />
-                                    </div>
-                                    <span className="text-xs font-bold mt-3 text-[#0B1B3D] dark:text-slate-200">Profile Details</span>
-                                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Manage account</span>
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Attendance Grid Summary */}
-                    <Card className="border border-slate-100 dark:border-slate-800 shadow-md">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-lg font-bold">Recent Attendance</CardTitle>
-                                <p className="text-xs text-muted-foreground">View your recent check-in track record</p>
-                            </div>
-                            <Link href="/dashboard/member/attendance" className="text-xs font-semibold text-[#C5A880] hover:underline flex items-center gap-1">
-                                See Full Log <ChevronRight className="h-3.5 w-3.5" />
-                            </Link>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                                {recentAttendance.length > 0 ? recentAttendance.map((record) => {
-                                    const d = new Date(record.date)
-                                    const isPresent = record.status === "PRESENT"
-                                    return (
-                                        <div key={record.id} className={`p-4 rounded-2xl flex flex-col items-center gap-2 border transition-all ${
-                                            isPresent 
-                                                ? 'bg-[#0B1B3D] border-[#0B1B3D] text-white shadow-sm' 
-                                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-[#0B1B3D] dark:text-slate-200'
-                                        }`}>
-                                            <span className="text-xs font-bold uppercase tracking-wider opacity-70">{d.toLocaleString('default', { weekday: 'short' })}</span>
-                                            <span className="text-2xl font-black">{d.getDate()}</span>
-                                            <span className="text-[9px] font-semibold">{d.toLocaleString('default', { month: 'short' })}</span>
-                                            <Badge className={`text-[9px] font-bold mt-1 shadow-none ${
-                                                isPresent 
-                                                    ? 'bg-emerald-500 text-white' 
-                                                    : 'bg-destructive/15 text-destructive border-none'
-                                            }`}>
-                                                {isPresent ? 'Present' : 'Absent'}
-                                            </Badge>
+            {/* Main 2-col Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1rem" }}>
+                {/* Left column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {/* Quick Actions Panel */}
+                    <div className="panel">
+                        <div className="panel-header" style={{ marginBottom: "0.75rem" }}>
+                            <h2 className="section-title">{t("member.dash.quickActions")}</h2>
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem" }}>
+                            {[
+                                { href: "/dashboard/member/finance", icon: CreditCard, label: t("member.dash.payDues"), color: "#0f766e" },
+                                { href: "/dashboard/member/attendance", icon: Calendar, label: t("member.dash.attendance"), color: "var(--admin-primary)" },
+                                { href: "/dashboard/member/grades", icon: GraduationCap, label: t("member.dash.grades"), color: "#6366f1" },
+                                { href: "/dashboard/member/profile", icon: User, label: t("member.dash.profileDetails"), color: "var(--admin-muted)" },
+                            ].map(({ href, icon: Icon, label, color }) => (
+                                <Link
+                                    key={href}
+                                    href={href}
+                                    style={{ textDecoration: "none" }}
+                                >
+                                    <div className="quick-action-card">
+                                        <div style={{ width: 44, height: 44, borderRadius: 8, background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", color, marginBottom: "0.6rem" }}>
+                                            <Icon size={20} />
                                         </div>
-                                    )
-                                }) : (
-                                    <div className="col-span-full py-8 text-center text-sm text-muted-foreground">
-                                        No recent attendance records found.
+                                        <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--admin-text)" }}>{label}</span>
                                     </div>
-                                )}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Attendance Grid */}
+                    <div className="panel">
+                        <div className="panel-header">
+                            <div>
+                                <h2 className="section-title">
+                                    <span className="title-icon"><Calendar size={16} /></span>
+                                    {t("member.dash.recentAttendance")}
+                                </h2>
+                                <p className="text-muted mb-0">{lang === "am" ? "የቅርብ ጊዜ ተገኝነትዎ" : "Your recent check-in record"}</p>
                             </div>
-                        </CardContent>
-                    </Card>
+                            <Link href="/dashboard/member/attendance" className="btn btn-sm btn-outline">
+                                {t("member.dash.seeFullLog")} <ChevronRight size={14} />
+                            </Link>
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "0.5rem" }}>
+                            {recentAttendance.length > 0 ? recentAttendance.map((record) => {
+                                const d = new Date(record.date)
+                                const isPresent = record.status === "PRESENT"
+                                return (
+                                    <div
+                                        key={record.id}
+                                        style={{
+                                            padding: "0.75rem 0.5rem",
+                                            borderRadius: 8,
+                                            textAlign: "center",
+                                            background: isPresent ? "var(--admin-primary)" : "var(--admin-surface-soft)",
+                                            border: `1px solid ${isPresent ? "var(--admin-primary)" : "var(--admin-border)"}`,
+                                            color: isPresent ? "#fff" : "var(--admin-text)",
+                                        }}
+                                    >
+                                        <div style={{ fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase", opacity: 0.7 }}>
+                                            {d.toLocaleString(lang === "am" ? 'am-ET' : 'en-US', { weekday: 'short' })}
+                                        </div>
+                                        <div style={{ fontSize: "1.4rem", fontWeight: 950, lineHeight: 1.1 }}>{d.getDate()}</div>
+                                        <div style={{ fontSize: "0.68rem", opacity: 0.7 }}>{d.toLocaleString(lang === "am" ? 'am-ET' : 'en-US', { month: 'short' })}</div>
+                                        <div style={{ marginTop: "0.35rem", fontSize: "0.7rem", fontWeight: 700, color: isPresent ? "#86efac" : "var(--admin-danger)" }}>
+                                            {isPresent ? t("member.dash.present") : t("member.dash.absent")}
+                                        </div>
+                                    </div>
+                                )
+                            }) : (
+                                <div style={{ gridColumn: "1/-1", padding: "2rem", textAlign: "center", color: "var(--admin-muted)", fontSize: "0.9rem" }}>
+                                    {t("member.dash.noAttendance")}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Right Column: Financial Standing & Service Status Details */}
-                <div className="space-y-6">
-                    {/* Recent Payments History */}
-                    <Card className="border border-slate-100 dark:border-slate-800 shadow-md">
-                        <CardHeader className="flex flex-row items-center justify-between">
+                {/* Right column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {/* Payments */}
+                    <div className="panel">
+                        <div className="panel-header">
                             <div>
-                                <CardTitle className="text-lg font-bold">Payments History</CardTitle>
+                                <h2 className="section-title">
+                                    <span className="title-icon"><CreditCard size={16} /></span>
+                                    {t("member.dash.paymentsHistory")}
+                                </h2>
                             </div>
-                            <Link href="/dashboard/member/finance" className="text-xs font-semibold text-[#C5A880] hover:underline">
-                                View All
+                            <Link href="/dashboard/member/finance" className="btn btn-sm btn-outline">
+                                {t("member.dash.viewAll")}
                             </Link>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                        </div>
+                        <div className="activity-list">
                             {recentPayments.length > 0 ? recentPayments.map((payment) => (
-                                <div key={payment.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                            <ArrowDownRight className="h-5 w-5 text-emerald-500" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-[#0B1B3D] dark:text-slate-200">
-                                                {payment.type === "MONTHLY_CONTRIBUTION" ? "Monthly Contribution" : payment.type.replace('_', ' ')}
+                                <div key={payment.id} className="activity-item">
+                                    <span className="activity-dot bg-success" />
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", minWidth: 0, width: "100%" }}>
+                                        <div style={{ minWidth: 0 }}>
+                                            <p className="mb-1 fw-semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "0.9rem" }}>
+                                                {payment.type === "MONTHLY_CONTRIBUTION" ? t("member.dash.monthlyContribution") : payment.type.replace('_', ' ')}
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">{new Date(payment.date).toLocaleDateString()}</p>
+                                            <p className="text-muted small mb-0">{new Date(payment.date).toLocaleDateString(lang === "am" ? 'am-ET' : 'en-US')}</p>
                                         </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-extrabold text-sm text-[#0B1B3D] dark:text-slate-200">{payment.amount.toLocaleString()} ETB</p>
-                                        <Badge className="text-[9px] font-bold mt-1 bg-emerald-500 hover:bg-emerald-500 text-white border-none shadow-none">Paid</Badge>
+                                        <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "0.5rem" }}>
+                                            <span style={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--admin-text)" }}>{Number(payment.amount).toLocaleString()} ETB</span>
+                                            <span className="badge badge-success" style={{ display: "block", marginTop: "0.2rem", fontSize: "0.7rem" }}>
+                                                {lang === "am" ? "የተከፈለ" : "Paid"}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             )) : (
-                                <div className="py-8 text-center text-sm text-muted-foreground">
-                                    No recent transactions found.
+                                <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--admin-muted)", fontSize: "0.9rem" }}>
+                                    {t("member.dash.noTransactions")}
                                 </div>
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
-                    {/* Resources & Support Helper */}
-                    <Card className="border-none shadow-md overflow-hidden bg-gradient-to-br from-[#0B1B3D] to-[#122754] text-white">
-                        <CardContent className="p-6 space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-[#C5A880]">
-                                    <BookOpen className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-sm">Need Resources or Help?</h4>
-                                    <p className="text-xs text-white/60">Access files, forms & guides</p>
-                                </div>
+                    {/* Resources */}
+                    <div className="panel" style={{ background: "var(--admin-primary)", color: "#fff", border: "none" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                            <div style={{ width: 38, height: 38, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <BookOpen size={18} />
                             </div>
-                            <p className="text-xs text-white/70 leading-relaxed">
-                                Get access to various study materials, choir hymnals, rules and regulations, and educational contents published by the admins.
-                            </p>
-                            <Link href="/dashboard/member/resources" className="inline-flex items-center justify-center w-full py-2.5 rounded-xl bg-[#C5A880] hover:bg-[#b59871] text-[#0B1B3D] text-xs font-bold transition">
-                                Open Portal Library
-                            </Link>
-                        </CardContent>
-                    </Card>
+                            <div>
+                                <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: 0 }}>{t("member.dash.resourcesHelp")}</p>
+                                <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: 0 }}>{t("member.dash.accessPortal")}</p>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: "0.85rem", opacity: 0.8, marginBottom: "0.85rem", lineHeight: 1.5 }}>
+                            {t("member.dash.resourcesDesc")}
+                        </p>
+                        <Link
+                            href="/dashboard/member/resources"
+                            className="btn btn-sm"
+                            style={{ background: "#fff", color: "var(--admin-primary)", border: "none", width: "100%", justifyContent: "center" }}
+                        >
+                            {t("member.dash.openLibrary")}
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

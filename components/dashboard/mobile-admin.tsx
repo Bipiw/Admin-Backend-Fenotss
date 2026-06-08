@@ -1,30 +1,30 @@
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Overview } from "@/components/dashboard/overview";
-import { Card, Avatar, AvatarFallback } from "@/components/ui";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, DollarSign, CalendarCheck, Megaphone } from "lucide-react";
 import { EthiopianDateDisplay } from "@/components/dashboard/ethiopian-date-display";
-import { useSession } from "next-auth/react";
-import prisma from "@/lib/prisma";
 
-export const MobileAdminDashboard = async () => {
-  const { data: session } = await getServerSession(authOptions);
-  // Fetch data – reuse same queries as desktop version
-  const totalMembers = await prisma.user.count({ where: { role: "MEMBER" } });
-  const totalUsers = await prisma.user.count();
-  const activeAnnouncements = await prisma.announcement.count({ where: { isActive: true } });
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const currentRev = await prisma.financialRecord.aggregate({
-    _sum: { amount: true },
-    where: { type: "MONTHLY_CONTRIBUTION", status: "PAID", date: { gte: startOfMonth } },
-  });
-  const monthlyRevenue = currentRev._sum.amount ? Number(currentRev._sum.amount) : 0;
-  const revenueTrend = 0; // simplified for mobile
-  const attendance = await prisma.attendance.groupBy({ by: ["memberId"], where: { status: "PRESENT" } });
-  const activeMembers = attendance.length;
+export interface MobileAdminDashboardProps {
+  userName: string;
+  totalMembers: number;
+  totalUsers: number;
+  monthlyRevenue: number;
+  activeMembers: number;
+  activeAnnouncements: number;
+  revenueTrend?: number;
+}
 
-  const userEmail = session?.user?.email || "";
-  const userName = userEmail.split("@")[0];
+export const MobileAdminDashboard = ({
+  userName,
+  totalMembers,
+  totalUsers,
+  monthlyRevenue,
+  activeMembers,
+  activeAnnouncements,
+  revenueTrend = 0,
+}: MobileAdminDashboardProps) => {
+  const initials = userName ? userName.substring(0, 2).toUpperCase() : "AD";
 
   return (
     <div className="p-4 space-y-6">
@@ -45,7 +45,7 @@ export const MobileAdminDashboard = async () => {
         <div className="bg-gradient-to-br from-[#0B1B3D] to-[#1a3060] p-4 text-center">
           <Avatar className="h-16 w-16 mx-auto ring-2 ring-[#C5A880] ring-offset-2 ring-offset-[#0B1B3D]">
             <AvatarFallback className="bg-[#C5A880] text-[#0B1B3D] text-lg font-bold">
-              {userName.substring(0, 2).toUpperCase()}
+              {initials}
             </AvatarFallback>
           </Avatar>
           <p className="mt-2 text-white font-medium">{userName}</p>

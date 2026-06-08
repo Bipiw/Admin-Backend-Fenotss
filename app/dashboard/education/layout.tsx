@@ -1,93 +1,29 @@
 "use client"
 
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { LayoutDashboard, GraduationCap, BookOpen, Library, LogOut, UserPlus, Key, ClipboardCheck } from "lucide-react"
-import { signOut } from "next-auth/react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { DashboardTopbar, DashboardBrand } from "@/components/dashboard/dashboard-topbar"
+import { LayoutDashboard, GraduationCap, Library, BookOpen, UserPlus } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
+import { DashboardShell, NavItem } from "@/components/dashboard/dashboard-shell"
 
 export default function EducationLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname()
+    const { t } = useLanguage()
 
-    const items = [
-        {
-            title: "Overview",
-            url: "/dashboard/education",
-            icon: LayoutDashboard,
-        },
-        {
-            title: "Enrollment / Promotion",
-            url: "/dashboard/education/enrollment",
-            icon: UserPlus,
-        },
-        {
-            title: "Student Records",
-            url: "/dashboard/education/records",
-            icon: Library,
-        },
-        {
-            title: "Grade Management",
-            url: "/dashboard/education/grades",
-            icon: GraduationCap,
-        },
-        {
-            title: "Curriculum / Levels",
-            url: "/dashboard/education/levels",
-            icon: BookOpen,
-        },
+    const navItems: NavItem[] = [
+        { title: t("sidebar.overview"), url: "/dashboard/education", icon: LayoutDashboard },
+        { title: t("sidebar.education.enrollment"), url: "/dashboard/education/enrollment", icon: UserPlus },
+        { title: t("sidebar.education.records"), url: "/dashboard/education/records", icon: Library },
+        { title: t("sidebar.education.grades"), url: "/dashboard/education/grades", icon: GraduationCap },
+        { title: t("sidebar.education.curriculum"), url: "/dashboard/education/levels", icon: BookOpen },
     ]
 
     return (
-        <SidebarProvider>
-            <div className="flex h-screen w-full">
-                <Sidebar>
-                    <SidebarHeader>
-                        <DashboardBrand icon={GraduationCap} title="Education Dept" subtitle="Academic Portal" />
-                    </SidebarHeader>
-                    <SidebarContent>
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Menu</SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    {items.map((item) => (
-                                        <SidebarMenuItem key={item.title}>
-                                            <SidebarMenuButton asChild isActive={pathname === item.url}>
-                                                <Link href={item.url}>
-                                                    <item.icon />
-                                                    <span>{item.title}</span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    ))}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    </SidebarContent>
-                    <SidebarFooter>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={pathname === "/dashboard/change-password"}>
-                                    <Link href="/dashboard/change-password">
-                                        <Key className="h-4 w-4" />
-                                        <span>Change Password</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton onClick={() => signOut({ callbackUrl: "/login" })}>
-                                    <LogOut />
-                                    <span>Sign Out</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarFooter>
-                </Sidebar>
-                <main className="flex-1 overflow-auto bg-muted/30">
-                    <DashboardTopbar title="Academic Administration" roleLabel="EDUCATION" />
-                    {children}
-                </main>
-            </div>
-        </SidebarProvider>
+        <DashboardShell
+            navItems={navItems}
+            brandTitle={t("role.education")}
+            brandSubtitle="Academic Portal"
+            brandIcon={GraduationCap}
+            roleLabel={t("role.education").toUpperCase()}
+        >
+            {children}
+        </DashboardShell>
     )
 }

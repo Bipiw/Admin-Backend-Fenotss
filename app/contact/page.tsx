@@ -329,7 +329,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation currentLang={currentLang} onLanguageChange={setCurrentLang} />
+      <Navigation />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -694,7 +694,7 @@ export default function ContactPage() {
         </section>
       </main>
 
-      <Footer currentLang={currentLang} />
+      <Footer />
     </div>
   )
 }

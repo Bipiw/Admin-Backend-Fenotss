@@ -334,7 +334,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation currentLang={currentLang} onLanguageChange={setCurrentLang} />
+      <Navigation />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -550,7 +550,7 @@ export default function AboutPage() {
         </section>
       </main>
 
-      <Footer currentLang={currentLang} />
+      <Footer />
     </div>
   )
 }

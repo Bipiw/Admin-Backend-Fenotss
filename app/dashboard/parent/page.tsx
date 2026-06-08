@@ -387,7 +387,7 @@ export default function ParentDashboard() {
         </div>
       </main>
 
-      <Footer currentLang={currentLang} />
+      <Footer />
     </div>
   )
 }

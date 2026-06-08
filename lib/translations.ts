@@ -1,0 +1,371 @@
+type Language = "en" | "am"
+
+export const translations = {
+  en: {
+    // Navigation & Common UI
+    "nav.home": "Home",
+    "nav.about": "About",
+    "nav.news": "News",
+    "nav.gallery": "Gallery",
+    "nav.contact": "Contact Us",
+    "nav.login": "Login",
+    "nav.joinSundaySchool": "Join Sunday School",
+    "nav.phone": "+251 94 424 7165",
+    "common.learnMore": "Learn More",
+    "common.joinUs": "Join Us",
+    "common.contact": "Contact",
+    "common.readMore": "Read More",
+    "common.viewAll": "View All",
+    "common.submit": "Submit",
+    "common.loading": "Loading...",
+    "common.changePassword": "Change Password",
+    "common.signOut": "Sign Out",
+    "common.systemStatus": "System running smoothly",
+    "changePassword.desc": "Update your account security settings",
+    "changePassword.current": "Current Password",
+    "changePassword.new": "New Password",
+    "changePassword.confirm": "Confirm New Password",
+    "changePassword.update": "Update Password",
+    "changePassword.updating": "Changing...",
+
+    // Sidebar & Menus
+    "sidebar.menu": "Menu",
+    "sidebar.account": "Account",
+    "sidebar.otherDashboards": "Other Dashboards",
+    "sidebar.overview": "Overview",
+    
+    // Roles & Depts
+    "role.superAdmin": "Super Admin",
+    "role.membersAffairs": "Members Affairs",
+    "role.finance": "Finance",
+    "role.education": "Education",
+    "role.choir": "Choir",
+    "role.office": "Office",
+    "role.member": "Member View",
+
+    // Admin Sidebar
+    "sidebar.admin.users": "User Management",
+    "sidebar.admin.settings": "System Settings",
+    "sidebar.admin.logs": "Audit Logs",
+    "sidebar.admin.notifications": "Notifications",
+
+    // Finance Sidebar
+    "sidebar.finance.ledger": "Monthly Ledger",
+    "sidebar.finance.payments": "Record Payment",
+    "sidebar.finance.transactions": "Transactions",
+    "sidebar.finance.defaulters": "Defaulters",
+
+    // Office Sidebar
+    "sidebar.office.members": "Member Search",
+    "sidebar.office.clearance": "Clearance / Offboarding",
+
+    // Members Affairs Sidebar
+    "sidebar.membersAffairs.directory": "Member Directory",
+    "sidebar.membersAffairs.attendance": "Attendance Logging",
+    "sidebar.membersAffairs.assignments": "Assignments",
+    "sidebar.membersAffairs.eligibility": "Eligibility Engine",
+
+    // Choir Sidebar
+    "sidebar.choir.attendance": "Choir Attendance",
+
+    // Education Sidebar
+    "sidebar.education.enrollment": "Enrollment / Promotion",
+    "sidebar.education.records": "Student Records",
+    "sidebar.education.grades": "Grade Management",
+    "sidebar.education.curriculum": "Curriculum / Levels",
+
+    // Member Sidebar
+    "sidebar.member.dashboard": "My Dashboard",
+    "sidebar.member.attendance": "My Attendance",
+    "sidebar.member.grades": "My Grades",
+    "sidebar.member.payments": "My Payments",
+    "sidebar.member.status": "Service Status",
+    "sidebar.member.resources": "Resources",
+    "sidebar.member.profile": "My Profile",
+
+    // Topbar & Search
+    "topbar.searchPlaceholder": "Search (Ctrl+K)...",
+    "topbar.noResults": "No results found for",
+    "topbar.searchTitle": "Global Search",
+    "topbar.searchDescription": "Search across members, announcements, financial ledger, and academic records.",
+    "topbar.categories.members": "Members Affairs & Users",
+    "topbar.categories.announcements": "Announcements",
+    "topbar.categories.finance": "Financial Records",
+    "topbar.categories.academics": "Academic & Grade Records",
+    "topbar.categories.actions": "Quick Commands",
+    
+    // Super Admin Dashboard Page
+    "admin.dash.welcome": "Welcome back",
+    "admin.dash.snapshot": "Here's a real-time snapshot of your organization.",
+    "admin.dash.totalMembers": "Total Members",
+    "admin.dash.totalUsersDetail": "total users in system",
+    "admin.dash.monthlyRevenue": "Monthly Revenue",
+    "admin.dash.contributionsDetail": "Contributions this month",
+    "admin.dash.activeMembers": "Active Members",
+    "admin.dash.activeRateDetail": "engagement (30d)",
+    "admin.dash.announcements": "Announcements",
+    "admin.dash.announcementsDetail": "Currently visible to users",
+    "admin.dash.attendanceTrends": "Attendance Trends",
+    "admin.dash.attendanceDetail": "Present check-ins over the last 6 months",
+    "admin.dash.systemHealthy": "System Healthy",
+    "admin.dash.allOperational": "All services operational",
+    "admin.dash.quickActions": "Quick Actions",
+    "quickActions.addUser": "Add User",
+    "quickActions.recordPayment": "Record Payment",
+    "quickActions.logAttendance": "Log Attendance",
+    "quickActions.enrollment": "Enrollment",
+    "quickActions.announcements": "Announcements",
+    "quickActions.settings": "Settings",
+
+    // Finance Dashboard Page
+    "finance.dash.title": "Financial Overview",
+    "finance.dash.monthlyIncome": "Monthly Income",
+    "finance.dash.monthlyDetail": "Collected this month",
+    "finance.dash.expectedIncome": "Expected Income",
+    "finance.dash.expectedDetail": "Based on active members",
+    "finance.dash.complianceRate": "Compliance Rate",
+    "finance.dash.complianceDetail": "Members paid this month",
+    "finance.dash.revenueTrend": "Revenue Trend",
+    "finance.dash.paymentStatus": "Payment Status (This Month)",
+
+    // Member Dashboard Page
+    "member.dash.title": "Member Dashboard",
+    "member.dash.welcomeBack": "Welcome back,",
+    "member.dash.department": "Department",
+    "member.dash.localDate": "Local Date",
+    "member.dash.serviceStatus": "Service Status",
+    "member.dash.eligible": "Eligible (ብቁ)",
+    "member.dash.pending": "Pending",
+    "member.dash.statusDetail": "Status of system clearance",
+    "member.dash.latestPayment": "Latest Payment",
+    "member.dash.paidOn": "Paid on",
+    "member.dash.noPayments": "No payments found",
+    "member.dash.attendanceRate": "Attendance Rate",
+    "member.dash.attendanceDetail": "Based on recent records",
+    "member.dash.engagement": "Engagement",
+    "member.dash.active": "Active",
+    "member.dash.operational": "Profile stands operational",
+    "member.dash.quickActions": "Quick Actions",
+    "member.dash.payDues": "Pay Dues",
+    "member.dash.attendance": "Attendance",
+    "member.dash.grades": "My Grades",
+    "member.dash.profileDetails": "Profile Details",
+    "member.dash.recentAttendance": "Recent Attendance",
+    "member.dash.seeFullLog": "See Full Log",
+    "member.dash.present": "Present",
+    "member.dash.absent": "Absent",
+    "member.dash.noAttendance": "No recent attendance records found.",
+    "member.dash.paymentsHistory": "Payments History",
+    "member.dash.viewAll": "View All",
+    "member.dash.noTransactions": "No recent transactions found.",
+    "member.dash.resourcesHelp": "Need Resources or Help?",
+    "member.dash.accessPortal": "Access files, forms & guides",
+    "member.dash.resourcesDesc": "Get access to various study materials, choir hymnals, rules and regulations, and educational contents published by the admins.",
+    "member.dash.openLibrary": "Open Portal Library",
+    "member.dash.monthlyContribution": "Monthly Contribution",
+
+    // Homepage
+    "home.hero.title": "Sunday School",
+    "home.hero.subtitle": "Growing in faith, wisdom, and service",
+    "home.stats.students": "Students Taught",
+    "home.stats.years": "Years of Service",
+    "home.stats.attendance": "Weekly Attendance",
+    "home.stats.teachers": "Volunteer Teachers",
+
+    // Footer
+    "footer.quickLinks": "Quick Links",
+    "footer.contact": "Contact Information",
+    "footer.newsletter": "Newsletter",
+    "footer.newsletterDesc": "Stay updated with our latest news and events",
+    "footer.subscribe": "Subscribe",
+    "footer.copyright": "© 2024 Fnote Selam Sunday School. All rights reserved.",
+    "footer.address": "Buraayu, Ethiopia",
+    "footer.email": "info@fnotesalam.org",
+  },
+  am: {
+    // Navigation & Common UI
+    "nav.home": "መነሻ",
+    "nav.about": "ስለ እኛ",
+    "nav.news": "ዜና",
+    "nav.gallery": "ምስሎች",
+    "nav.contact": "ያግኙን",
+    "nav.login": "ግባ",
+    "nav.joinSundaySchool": "ይቀላቀሉ",
+    "nav.phone": "+251 94 424 7165",
+    "common.learnMore": "ተጨማሪ ይወቁ",
+    "common.joinUs": "ተቀላቀሉ",
+    "common.contact": "ተገናኝ",
+    "common.readMore": "ተጨማሪ ያንብቡ",
+    "common.viewAll": "ሁሉንም ይመልከቱ",
+    "common.submit": "ላክ",
+    "common.loading": "እየጫነ...",
+    "common.changePassword": "የይለፍ ቃል ቀይር",
+    "common.signOut": "ውጣ",
+    "common.systemStatus": "ስርዓቱ በጥሩ ሁኔታ ነው",
+    "changePassword.desc": "የመለያዎን የደህንነት ቅንብሮች ያዘምኑ",
+    "changePassword.current": "የአሁኑ የይለፍ ቃል",
+    "changePassword.new": "አዲስ የይለፍ ቃል",
+    "changePassword.confirm": "አዲሱን የይለፍ ቃል ያረጋግጡ",
+    "changePassword.update": "የይለፍ ቃል አዘምን",
+    "changePassword.updating": "እየቀየረ ነው...",
+
+    // Sidebar & Menus
+    "sidebar.menu": "ምናሌ",
+    "sidebar.account": "መለያ",
+    "sidebar.otherDashboards": "ሌሎች ዳሽቦርዶች",
+    "sidebar.overview": "አጠቃላይ እይታ",
+
+    // Roles & Depts
+    "role.superAdmin": "ሱፐር አድሚን",
+    "role.membersAffairs": "የአባላት ጉዳይ",
+    "role.finance": "ፋይናንስ",
+    "role.education": "ትምህርት",
+    "role.choir": "መዘምራን",
+    "role.office": "ቢሮ",
+    "role.member": "የአባል እይታ",
+
+    // Admin Sidebar
+    "sidebar.admin.users": "የተጠቃሚዎች ማውጫ",
+    "sidebar.admin.settings": "የስርዓት ቅንብሮች",
+    "sidebar.admin.logs": "የቁጥጥር ምዝገቦች",
+    "sidebar.admin.notifications": "ማሳወቂያዎች",
+
+    // Finance Sidebar
+    "sidebar.finance.ledger": "ወርሃዊ ደብተር",
+    "sidebar.finance.payments": "ክፍያ መዝግብ",
+    "sidebar.finance.transactions": "የክፍያ ታሪክ",
+    "sidebar.finance.defaulters": "ያልከፈሉ አባላት",
+
+    // Office Sidebar
+    "sidebar.office.members": "አባላትን ፈልግ",
+    "sidebar.office.clearance": "ማረጋገጫ / ስንብት",
+
+    // Members Affairs Sidebar
+    "sidebar.membersAffairs.directory": "የአባላት ዝርዝር",
+    "sidebar.membersAffairs.attendance": "የተገኝነት መዝገብ",
+    "sidebar.membersAffairs.assignments": "ምደባዎች",
+    "sidebar.membersAffairs.eligibility": "የብቁነት መቆጣጠሪያ",
+
+    // Choir Sidebar
+    "sidebar.choir.attendance": "የመዘምራን ተገኝነት",
+
+    // Education Sidebar
+    "sidebar.education.enrollment": "ምዝገባ / ደረጃ ማሳደግ",
+    "sidebar.education.records": "የተማሪዎች መዝገብ",
+    "sidebar.education.grades": "የውጤት አስተዳደር",
+    "sidebar.education.curriculum": "የስርዓተ ትምህርት ደረጃዎች",
+
+    // Member Sidebar
+    "sidebar.member.dashboard": "የኔ ዳሽቦርድ",
+    "sidebar.member.attendance": "የኔ ተገኝነት",
+    "sidebar.member.grades": "የኔ ውጤቶች",
+    "sidebar.member.payments": "የኔ ክፍያዎች",
+    "sidebar.member.status": "የአገልግሎት ደረጃ",
+    "sidebar.member.resources": "የትምህርት ግብዓቶች",
+    "sidebar.member.profile": "የአባልነት መገለጫ",
+
+    // Topbar & Search
+    "topbar.searchPlaceholder": "ፈልግ (Ctrl+K)...",
+    "topbar.noResults": "የተገኘ ውጤት የለም ለ",
+    "topbar.searchTitle": "አጠቃላይ ፍለጋ",
+    "topbar.searchDescription": "በአባላት፣ በማስታወቂያዎች፣ በፋይናንስ ደብተሮች እና በትምህርት መዝገቦች ውስጥ ይፈልጉ።",
+    "topbar.categories.members": "የአባላት ጉዳይ እና ተጠቃሚዎች",
+    "topbar.categories.announcements": "ማስታወቂያዎች",
+    "topbar.categories.finance": "የፋይናንስ መዝገቦች",
+    "topbar.categories.academics": "የአካዳሚክ እና ውጤት መዝገቦች",
+    "topbar.categories.actions": "ፈጣን ትዕዛዞች",
+
+    // Super Admin Dashboard Page
+    "admin.dash.welcome": "እንኳን ደህና መጡ",
+    "admin.dash.snapshot": "እዚህ የድርጅትዎን የቀጥታ ሁኔታ በቅጽበት መከታተል ይችላሉ።",
+    "admin.dash.totalMembers": "ጠቅላላ አባላት",
+    "admin.dash.totalUsersDetail": "በስርዓቱ ውስጥ ያሉ ጠቅላላ ተጠቃሚዎች",
+    "admin.dash.monthlyRevenue": "ወርሃዊ ገቢ",
+    "admin.dash.contributionsDetail": "የዚህ ወር አጠቃላይ መዋጮ",
+    "admin.dash.activeMembers": "ንቁ አባላት",
+    "admin.dash.activeRateDetail": "የተሳትፎ ደረጃ (30 ቀን)",
+    "admin.dash.announcements": "ማስታወቂያዎች",
+    "admin.dash.announcementsDetail": "በአሁኑ ጊዜ ለአባላት የሚታዩ",
+    "admin.dash.attendanceTrends": "የተገኝነት አዝማሚያዎች",
+    "admin.dash.attendanceDetail": "ባለፉት 6 ወራት የተመዘገቡ ተገኝነቶች",
+    "admin.dash.systemHealthy": "ስርዓቱ በጥሩ ሁኔታ ላይ ነው",
+    "admin.dash.allOperational": "ሁሉም አገልግሎቶች እየሰሩ ነው",
+    "admin.dash.quickActions": "ፈጣን እርምጃዎች",
+    "quickActions.addUser": "ተጠቃሚ ጨምር",
+    "quickActions.recordPayment": "ክፍያ መዝግብ",
+    "quickActions.logAttendance": "ተገኝነት መዝግብ",
+    "quickActions.enrollment": "ምዝገባ / ማሳደግ",
+    "quickActions.announcements": "ማስታወቂያዎች",
+    "quickActions.settings": "ቅንብሮች",
+
+    // Finance Dashboard Page
+    "finance.dash.title": "የፋይናንስ አጠቃላይ እይታ",
+    "finance.dash.monthlyIncome": "ወርሃዊ ገቢ",
+    "finance.dash.monthlyDetail": "በዚህ ወር የተሰበሰበ",
+    "finance.dash.expectedIncome": "የሚጠበቅ ገቢ",
+    "finance.dash.expectedDetail": "በንቁ አባላት ብዛት ላይ በመመስረት",
+    "finance.dash.complianceRate": "የክፍያ ተገዢነት መጠን",
+    "finance.dash.complianceDetail": "በዚህ ወር የከፈሉ አባላት",
+    "finance.dash.revenueTrend": "የገቢ አዝማሚያ",
+    "finance.dash.paymentStatus": "የክፍያ ሁኔታ (የዚህ ወር)",
+
+    // Member Dashboard Page
+    "member.dash.title": "የአባል ዳሽቦርድ",
+    "member.dash.welcomeBack": "እንኳን ደህና መጡ፣",
+    "member.dash.department": "ክፍል",
+    "member.dash.localDate": "የአሁኑ ቀን",
+    "member.dash.serviceStatus": "የአገልግሎት ደረጃ",
+    "member.dash.eligible": "ብቁ",
+    "member.dash.pending": "በመጠባበቅ ላይ",
+    "member.dash.statusDetail": "የስርዓት ማረጋገጫ ሁኔታ",
+    "member.dash.latestPayment": "የመጨረሻው ክፍያ",
+    "member.dash.paidOn": "የተከፈለበት ቀን",
+    "member.dash.noPayments": "ምንም የክፍያ ታሪክ የለም",
+    "member.dash.attendanceRate": "የተገኝነት መጠን",
+    "member.dash.attendanceDetail": "በቅርብ ጊዜ መዝገቦች መሠረት",
+    "member.dash.engagement": "ተሳትፎ",
+    "member.dash.active": "ንቁ",
+    "member.dash.operational": "መገለጫው በጥሩ ሁኔታ ላይ ነው",
+    "member.dash.quickActions": "ፈጣን እርምጃዎች",
+    "member.dash.payDues": "መዋጮ ክፈል",
+    "member.dash.attendance": "ተገኝነት",
+    "member.dash.grades": "የኔ ውጤቶች",
+    "member.dash.profileDetails": "መገለጫ ማስተዳደሪያ",
+    "member.dash.recentAttendance": "የቅርብ ጊዜ ተገኝነት",
+    "member.dash.seeFullLog": "ሙሉውን መዝገብ ይመልከቱ",
+    "member.dash.present": "ተገኝቷል",
+    "member.dash.absent": "ተቀርቷል",
+    "member.dash.noAttendance": "ምንም የቅርብ ጊዜ ተገኝነት አልተገኘም።",
+    "member.dash.paymentsHistory": "የክፍያዎች ታሪክ",
+    "member.dash.viewAll": "ሁሉንም ይመልከቱ",
+    "member.dash.noTransactions": "ምንም የክፍያ ታሪክ አልተገኘም።",
+    "member.dash.resourcesHelp": "እገዛ ወይም መማሪያ ይፈልጋሉ?",
+    "member.dash.accessPortal": "ሰነዶች፣ ቅጾች እና መመሪያዎች",
+    "member.dash.resourcesDesc": "በአስተዳዳሪዎች የታተሙ የተለያዩ የትምህርት ቁሳቁሶችን፣ የመዝሙር ደብተሮችን፣ ደንቦችን እና መመሪያዎችን ያግኙ።",
+    "member.dash.openLibrary": "መጽሐፍ መደብር ክፈት",
+    "member.dash.monthlyContribution": "ወርሃዊ መዋጮ",
+
+    // Homepage
+    "home.hero.title": "ሰንበት ት/ቤት",
+    "home.hero.subtitle": "የእምነት እውቀት እና አገልግሎት ማሻሻያ",
+    "home.stats.students": "የተማሩ ተማሪዎች",
+    "home.stats.years": "የአገልግሎት ዓመታት",
+    "home.stats.attendance": "ሳምንታዊ ተሳትፎ",
+    "home.stats.teachers": "በጎ ፈቃደኛ መምህራን",
+
+    // Footer
+    "footer.quickLinks": "ፈጣን አገናኞች",
+    "footer.contact": "የመገናኛ መረጃ",
+    "footer.newsletter": "ዜና ወረቀት",
+    "footer.newsletterDesc": "የእኛን የቅርብ ጊዜ ዜናዎች እና ክስተቶች ይከታተሉ",
+    "footer.subscribe": "ይመዝገቡ",
+    "footer.copyright": "© 2024 ፍኖተ ሰላም ሰንበት ት/ቤት። ሁሉም መብቶች የተጠበቁ ናቸው።",
+    "footer.address": "ቡራዩ፣ ኢትዮጵያ",
+    "footer.email": "info@fnotesalam.org",
+  },
+}
+
+export function getTranslation(lang: string, key: string): string {
+  const dictionary = translations[lang as Language] || translations["en"]
+  return dictionary[key as keyof typeof translations["en"]] || key
+}
