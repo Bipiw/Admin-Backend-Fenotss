@@ -21,7 +21,7 @@ export default function MyAttendancePage() {
         <div className="p-8 space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">My Attendance History</h2>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

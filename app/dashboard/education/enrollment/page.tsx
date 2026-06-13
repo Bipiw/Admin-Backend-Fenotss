@@ -84,7 +84,7 @@ export default function EnrollmentPage() {
                 <p className="text-muted-foreground">Bulk promote students to the next academic level.</p>
             </div>
 
-            <div className="flex gap-4 items-end bg-slate-50 p-4 rounded-lg">
+            <div className="flex gap-4 items-end bg-muted/50 p-4 rounded-lg">
                 <div className="space-y-2 w-32">
                     <Label>From Year</Label>
                     <Select value={currentYear} onValueChange={setCurrentYear}>
@@ -107,7 +107,7 @@ export default function EnrollmentPage() {
                 <Button variant="ghost" onClick={fetchStudents}>Refresh</Button>
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

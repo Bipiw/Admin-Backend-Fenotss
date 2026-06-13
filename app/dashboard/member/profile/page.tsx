@@ -136,7 +136,7 @@ export default function ProfilePage() {
 
                             <div className="space-y-2">
                                 <Label>Email</Label>
-                                <Input disabled value={profile.email} className="bg-slate-50" />
+                                <Input disabled value={profile.email} className="bg-muted/50" />
                                 <p className="text-xs text-muted-foreground">Contact admin to change email.</p>
                             </div>
 
@@ -196,14 +196,14 @@ export default function ProfilePage() {
                         <CardDescription>Your membership and department details.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="p-4 border rounded-lg bg-slate-50 flex justify-between items-center">
+                        <div className="p-4 border rounded-lg bg-muted/50 flex justify-between items-center">
                             <div>
                                 <p className="font-medium text-sm text-muted-foreground">Membership Status</p>
                                 <p className="font-bold text-green-600">Active</p>
                             </div>
                             <User className="h-8 w-8 text-slate-300" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-slate-50 flex justify-between items-center">
+                        <div className="p-4 border rounded-lg bg-muted/50 flex justify-between items-center">
                             <div>
                                 <p className="font-medium text-sm text-muted-foreground">Department</p>
                                 <p className="font-bold">{profile.department}</p>

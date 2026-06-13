@@ -163,7 +163,7 @@ export default function RecordsPage() {
                 />
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

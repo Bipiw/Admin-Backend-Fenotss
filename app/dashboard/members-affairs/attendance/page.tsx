@@ -111,7 +111,7 @@ export default function AttendanceLoggingPage() {
                 <Button size="sm" variant="outline" onClick={() => setAll("ABSENT")}>Mark All Absent</Button>
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

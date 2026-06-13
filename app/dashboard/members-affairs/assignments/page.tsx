@@ -47,7 +47,7 @@ export default function AssignmentManagerPage() {
                 <p className="text-muted-foreground">Assign active members to service departments.</p>
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

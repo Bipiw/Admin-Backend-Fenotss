@@ -237,7 +237,7 @@ export default function MembersDirectoryPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Email</Label>
-                                    <Input disabled value={editMember.email} className="bg-slate-50" />
+                                    <Input disabled value={editMember.email} className="bg-muted/50" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>New Password (Optional)</Label>
@@ -294,7 +294,7 @@ export default function MembersDirectoryPage() {
                 />
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -313,7 +313,7 @@ export default function MembersDirectoryPage() {
                             filtered.map(m => (
                                 <TableRow key={m.id}>
                                     <TableCell className="font-medium flex items-center gap-2">
-                                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
+                                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
                                             <UserIcon className="h-4 w-4 text-slate-500" />
                                         </div>
                                         {m.profile?.firstName} {m.profile?.lastName}

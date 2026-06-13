@@ -59,7 +59,7 @@ export default function ResourcesPage() {
                     {loading ? <p>Loading...</p> : data.materials.length === 0 ? <p className="text-muted-foreground">No materials uploaded yet.</p> : (
                         <div className="grid gap-4">
                             {data.materials.map((m: any) => (
-                                <Card key={m.id} className="hover:bg-slate-50 transition-colors">
+                                <Card key={m.id} className="hover:bg-muted/50 transition-colors">
                                     <CardHeader className="pb-2">
                                         <div className="flex items-start gap-4">
                                             <div className="mt-1">

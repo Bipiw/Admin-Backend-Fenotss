@@ -44,7 +44,7 @@ export default function DefaultersPage() {
                 <p className="text-muted-foreground">Members with outstanding contributions (&gt; 2 months).</p>
             </div>
 
-            <div className="border rounded-lg bg-white">
+            <div className="border rounded-lg bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

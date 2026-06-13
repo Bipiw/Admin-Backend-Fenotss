@@ -122,11 +122,11 @@ export default function PaymentEntryPage() {
                                     onFocus={() => setShowDropdown(true)}
                                 />
                                 {showDropdown && searchTerm && filteredMembers.length > 0 && (
-                                    <div className="absolute z-10 w-full bg-white border rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
+                                    <div className="absolute z-10 w-full bg-popover border rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
                                         {filteredMembers.map(m => (
                                             <div
                                                 key={m.id}
-                                                className={`p-3 cursor-pointer hover:bg-slate-100 flex justify-between items-center ${selectedMember === m.id ? "bg-slate-50 font-medium" : ""}`}
+                                                className={`p-3 cursor-pointer hover:bg-muted flex justify-between items-center ${selectedMember === m.id ? "bg-muted/50 font-medium" : ""}`}
                                                 onClick={() => {
                                                     setSelectedMember(m.id)
                                                     setSearchTerm(m.profile.firstName + " " + m.profile.lastName)
@@ -143,7 +143,7 @@ export default function PaymentEntryPage() {
                                     </div>
                                 )}
                                 {showDropdown && searchTerm && filteredMembers.length === 0 && (
-                                    <div className="absolute z-10 w-full bg-white border rounded-md mt-1 shadow-lg p-4 text-center text-muted-foreground text-sm">
+                                    <div className="absolute z-10 w-full bg-popover border rounded-md mt-1 shadow-lg p-4 text-center text-muted-foreground text-sm">
                                         No members found.
                                     </div>
                                 )}
