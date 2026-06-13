@@ -72,9 +72,67 @@ export function DashboardShell({
   const [searchResults, setSearchResults] = useState<SearchResultGroup[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
+
+  const fetchNotifications = async () => {
+    if (!session) return
+    try {
+      const res = await fetch("/api/notifications/member")
+      if (res.ok) {
+        const data = await res.json()
+        setNotifications(data)
+        setUnreadCount(data.filter((n: any) => !n.isRead).length)
+      }
+    } catch { /* silent */ }
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 30000)
+    return () => clearInterval(interval)
+  }, [session])
+
+  const markAllRead = async () => {
+    try {
+      const res = await fetch("/api/notifications/member", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+        setUnreadCount(0)
+      }
+    } catch { /* silent */ }
+  }
+
+  const markSingleRead = async (id: string) => {
+    try {
+      const res = await fetch("/api/notifications/member", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n))
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      }
+    } catch { /* silent */ }
+  }
+
+  const handleNotifToggle = () => {
+    setNotifOpen(o => {
+      const next = !o
+      if (next) {
+        fetchNotifications()
+      }
+      return next
+    })
+  }
 
   // Persist dark mode
   useEffect(() => {
@@ -82,8 +140,10 @@ export function DashboardShell({
     if (saved === "dark") {
       setDarkMode(true)
       document.documentElement.setAttribute("data-theme", "dark")
+      document.documentElement.classList.add("dark")
     } else {
       document.documentElement.setAttribute("data-theme", "light")
+      document.documentElement.classList.remove("dark")
     }
   }, [])
 
@@ -107,6 +167,11 @@ export function DashboardShell({
     const next = !darkMode
     setDarkMode(next)
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light")
+    if (next) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
     localStorage.setItem("theme", next ? "dark" : "light")
   }
 
@@ -346,21 +411,59 @@ export function DashboardShell({
                 <button
                   className="icon-button"
                   type="button"
-                  onClick={() => setNotifOpen(o => !o)}
+                  onClick={handleNotifToggle}
                   aria-label="Notifications"
                 >
-                  <span className="notification-dot" />
+                  {unreadCount > 0 && <span className="notification-dot" />}
                   <Bell size={16} />
                 </button>
                 {notifOpen && (
-                  <div className="dropdown-menu notification-menu">
-                    <div style={{ padding: "0.65rem 1rem", fontWeight: 700, fontSize: "0.9rem", color: "var(--admin-text)", borderBottom: "1px solid var(--admin-border)" }}>
-                      Notifications
+                  <div className="dropdown-menu notification-menu" style={{ width: "320px", maxHeight: "400px", overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.65rem 1rem", borderBottom: "1px solid var(--admin-border)" }}>
+                      <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--admin-text)" }}>Notifications</span>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllRead}
+                          style={{ fontSize: "0.75rem", color: "var(--admin-accent, #ffab00)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                        >
+                          Mark all read
+                        </button>
+                      )}
                     </div>
-                    <a className="dropdown-item" href="#" onClick={e => e.preventDefault()}>
-                      <span className="notification-title">{t("admin.dash.announcements")}</span>
-                      <span className="notification-time">Just now</span>
-                    </a>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      {notifications.length === 0 ? (
+                        <div style={{ padding: "1.5rem", textAlign: "center", fontSize: "0.88rem", color: "var(--admin-muted)" }}>
+                          No notifications
+                        </div>
+                      ) : (
+                        notifications.slice(0, 5).map((n) => (
+                          <div
+                            key={n.id}
+                            className={`dropdown-item ${n.isRead ? "" : "unread"}`}
+                            style={{
+                              padding: "0.75rem 1rem",
+                              borderBottom: "1px solid var(--admin-border-soft, rgba(0,0,0,0.05))",
+                              cursor: "pointer",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.15rem",
+                              backgroundColor: n.isRead ? "transparent" : "var(--admin-surface-hover, rgba(0, 19, 51, 0.03))"
+                            }}
+                            onClick={() => markSingleRead(n.id)}
+                          >
+                            <span style={{ fontWeight: n.isRead ? 500 : 700, fontSize: "0.85rem", color: "var(--admin-text)" }}>
+                              {n.title}
+                            </span>
+                            <span style={{ fontSize: "0.78rem", color: "var(--admin-muted)" }}>
+                              {n.content}
+                            </span>
+                            <span style={{ fontSize: "0.7rem", color: "var(--admin-muted)", marginTop: "0.1rem" }}>
+                              {new Date(n.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

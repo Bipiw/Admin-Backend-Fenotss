@@ -217,3 +217,12 @@ model SystemSetting {
   description String?
   updatedAt   DateTime @updatedAt
 }
+
+model Asset {
+  id        String   @id @default(cuid())
+  name      String
+  category  String   // e.g. AUDIO, FURNITURE
+  status    String   // e.g. FUNCTIONAL, MAINTENANCE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

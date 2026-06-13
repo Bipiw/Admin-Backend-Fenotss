@@ -9,6 +9,23 @@ async function computeEligibility(profileId: string) {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 90) // 90 days window
 
+    // Load dynamic thresholds from SystemSetting, fallback to constants
+    const settings = await prisma.systemSetting.findMany()
+    const thresholds: {
+        MIN_ATTENDANCE_RATE: number;
+        MIN_FINANCE_RATE: number;
+        MIN_ACADEMIC_SCORE: number;
+    } = {
+        MIN_ATTENDANCE_RATE: ELIGIBILITY_THRESHOLDS.MIN_ATTENDANCE_RATE,
+        MIN_FINANCE_RATE: ELIGIBILITY_THRESHOLDS.MIN_FINANCE_RATE,
+        MIN_ACADEMIC_SCORE: ELIGIBILITY_THRESHOLDS.MIN_ACADEMIC_SCORE,
+    }
+    for (const s of settings) {
+        if (s.key === "MIN_ATTENDANCE_RATE") thresholds.MIN_ATTENDANCE_RATE = parseFloat(s.value)
+        if (s.key === "MIN_FINANCE_RATE") thresholds.MIN_FINANCE_RATE = parseFloat(s.value)
+        if (s.key === "MIN_ACADEMIC_SCORE") thresholds.MIN_ACADEMIC_SCORE = parseFloat(s.value)
+    }
+
     // Attendance rate
     const [presentCount, totalAttendance] = await Promise.all([
         prisma.attendance.count({ where: { memberId: profileId, status: "PRESENT", date: { gte: thirtyDaysAgo } } }),
@@ -41,17 +58,17 @@ async function computeEligibility(profileId: string) {
     }
 
     const isEligible =
-        attendanceRate >= ELIGIBILITY_THRESHOLDS.MIN_ATTENDANCE_RATE &&
-        financeRate >= ELIGIBILITY_THRESHOLDS.MIN_FINANCE_RATE &&
-        academicScore >= ELIGIBILITY_THRESHOLDS.MIN_ACADEMIC_SCORE
+        attendanceRate >= thresholds.MIN_ATTENDANCE_RATE &&
+        financeRate >= thresholds.MIN_FINANCE_RATE &&
+        academicScore >= thresholds.MIN_ACADEMIC_SCORE
 
     const reasons: string[] = []
-    if (attendanceRate < ELIGIBILITY_THRESHOLDS.MIN_ATTENDANCE_RATE)
-        reasons.push(`Attendance ${Math.round(attendanceRate)}% < ${ELIGIBILITY_THRESHOLDS.MIN_ATTENDANCE_RATE}%`)
-    if (financeRate < ELIGIBILITY_THRESHOLDS.MIN_FINANCE_RATE)
-        reasons.push(`Finance ${Math.round(financeRate)}% < ${ELIGIBILITY_THRESHOLDS.MIN_FINANCE_RATE}%`)
-    if (grades.length > 0 && academicScore < ELIGIBILITY_THRESHOLDS.MIN_ACADEMIC_SCORE)
-        reasons.push(`Academic score ${Math.round(academicScore)}% < ${ELIGIBILITY_THRESHOLDS.MIN_ACADEMIC_SCORE}%`)
+    if (attendanceRate < thresholds.MIN_ATTENDANCE_RATE)
+        reasons.push(`Attendance ${Math.round(attendanceRate)}% < ${thresholds.MIN_ATTENDANCE_RATE}%`)
+    if (financeRate < thresholds.MIN_FINANCE_RATE)
+        reasons.push(`Finance ${Math.round(financeRate)}% < ${thresholds.MIN_FINANCE_RATE}%`)
+    if (grades.length > 0 && academicScore < thresholds.MIN_ACADEMIC_SCORE)
+        reasons.push(`Academic score ${Math.round(academicScore)}% < ${thresholds.MIN_ACADEMIC_SCORE}%`)
 
     return {
         status: isEligible ? EligibilityStatus.ELIGIBLE : EligibilityStatus.INELIGIBLE,
