@@ -259,7 +259,7 @@ export default function GalleryPage() {
                 >
                   <div className="aspect-square relative overflow-hidden">
                     <Image
-                      src={item.image || "/placeholder.svg"}
+                      src={item.image || "/images/church-logo.png"}
                       alt={item.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -307,7 +307,7 @@ export default function GalleryPage() {
                 >
                   <div className="aspect-video relative overflow-hidden">
                     <Image
-                      src={video.thumbnail || "/placeholder.svg"}
+                      src={video.thumbnail || "/images/church-logo.png"}
                       alt={video.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -361,7 +361,7 @@ export default function GalleryPage() {
             <DialogContent className="max-w-4xl w-full h-[80vh] p-0">
               <div className="relative w-full h-full bg-black">
                 <Image
-                  src={selectedItem.image || "/placeholder.svg"}
+                  src={selectedItem.image || "/images/church-logo.png"}
                   alt={selectedItem.title}
                   fill
                   className="object-contain"

@@ -336,7 +336,7 @@ export default function NewsPage() {
                 >
                   <div className="aspect-video relative overflow-hidden">
                     <Image
-                      src={article.image || "/placeholder.svg"}
+                      src={article.image || "/images/church-logo.png"}
                       alt={article.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

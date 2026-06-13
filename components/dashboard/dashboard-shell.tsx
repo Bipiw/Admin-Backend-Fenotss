@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
@@ -63,6 +64,7 @@ export function DashboardShell({
   const userName = userEmail.split("@")[0] || roleLabel
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -84,6 +86,22 @@ export function DashboardShell({
       document.documentElement.setAttribute("data-theme", "light")
     }
   }, [])
+
+  // Persist sidebar collapsed state
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebarCollapsed")
+    if (saved === "true") setSidebarCollapsed(true)
+  }, [])
+
+  useEffect(() => {
+    if (sidebarCollapsed) {
+      document.body.classList.add("sidebar-mini")
+    } else {
+      document.body.classList.remove("sidebar-mini")
+    }
+    localStorage.setItem("sidebarCollapsed", String(sidebarCollapsed))
+    return () => { document.body.classList.remove("sidebar-mini") }
+  }, [sidebarCollapsed])
 
   const toggleTheme = () => {
     const next = !darkMode
@@ -146,7 +164,13 @@ export function DashboardShell({
         <div className="sidebar-header">
           <Link className="brand-mark" href="/" aria-label="Fenot dashboard">
             <span className="brand-icon">
-              <BrandIcon size={20} />
+              <Image
+                src="/images/church-logo.png"
+                alt="Fenot Church"
+                width={32}
+                height={32}
+                style={{ objectFit: "contain" }}
+              />
             </span>
             <span className="brand-copy">
               <span className="brand-title">Fenot</span>
@@ -225,11 +249,17 @@ export function DashboardShell({
         {/* Navbar */}
         <nav className="admin-navbar" aria-label="Top navigation">
           <div className="navbar-inner">
-            {/* Hamburger */}
+            {/* Hamburger / Collapse toggle */}
             <button
               className="sidebar-toggle"
               type="button"
-              onClick={() => setSidebarOpen(o => !o)}
+              onClick={() => {
+                if (window.innerWidth >= 992) {
+                  setSidebarCollapsed(o => !o)
+                } else {
+                  setSidebarOpen(o => !o)
+                }
+              }}
               aria-controls="adminSidebar"
               aria-expanded={sidebarOpen}
               aria-label="Toggle sidebar"

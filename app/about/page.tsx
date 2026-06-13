@@ -463,7 +463,7 @@ export default function AboutPage() {
                   <CardHeader>
                     <div className="w-32 h-32 mx-auto mb-4 relative">
                       <Image
-                        src={member.image || "/placeholder.svg"}
+                        src={member.image || "/images/church-logo.png"}
                         alt={member.name}
                         fill
                         className="object-cover rounded-full"
