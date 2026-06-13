@@ -72,6 +72,7 @@ export const translations = {
     "sidebar.education.enrollment": "Enrollment / Promotion",
     "sidebar.education.records": "Student Records",
     "sidebar.education.grades": "Grade Management",
+    "sidebar.education.resources": "Study Resources",
     "sidebar.education.curriculum": "Curriculum / Levels",
 
     // Member Sidebar
@@ -253,6 +254,7 @@ export const translations = {
     "sidebar.education.enrollment": "ምዝገባ / ደረጃ ማሳደግ",
     "sidebar.education.records": "የተማሪዎች መዝገብ",
     "sidebar.education.grades": "የውጤት አስተዳደር",
+    "sidebar.education.resources": "የጥናት ቁሳቁሶች",
     "sidebar.education.curriculum": "የስርዓተ ትምህርት ደረጃዎች",
 
     // Member Sidebar
